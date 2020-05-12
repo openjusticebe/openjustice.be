@@ -1,0 +1,46 @@
+language: node_js
+node_js:
+- 10
+
+stages:
+  - build
+  - test
+  - deploy
+
+git:
+  submodules: false
+dist: trusty
+sudo: false
+cache:
+  npm: true
+  directories:
+    - public
+    - ~/.cache
+    - "$HOME/.npm"
+
+addons:
+  apt:
+    packages:
+      # Ubuntu 16+ does not install this dependency by default, so we need to install it ourselves
+      - libgconf-2-4
+
+install:
+  - npm version
+  - npm ci
+
+jobs:
+  include:
+  - stage: build
+    name: Build static pages
+    script: 
+      - npm run build
+    skip_cleanup: true
+  # - stage: deploy
+  #   name: Deploy pages to host
+  #   if: branch = master AND type = push AND fork = false
+  #   skip_cleanup: true
+  #   env:
+  #     - GATSBY_ACTIVE_ENV=prod
+  #   script: 
+  #     - ls public/
+  #     - npm run build
